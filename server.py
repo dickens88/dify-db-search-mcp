@@ -121,7 +121,7 @@ async def search_dify_credentials(keyword: str) -> str:
         # 1. provider_model_credentials
         rows = await conn.fetch(
             """
-            SELECT provider_name, model_name, model_type, created_at, updated_at
+            SELECT provider_name, model_name, created_at, updated_at
             FROM provider_model_credentials
             WHERE encrypted_config ILIKE $1 OR credential_name ILIKE $1
             ORDER BY updated_at DESC
@@ -131,7 +131,7 @@ async def search_dify_credentials(keyword: str) -> str:
         )
         results["provider_model_credentials"] = _format_rows(
             rows,
-            ["provider_name", "model_name", "model_type", "created_at", "updated_at"],
+            ["provider_name", "model_name", "created_at", "updated_at"],
         )
 
         # 2. tool_builtin_providers
