@@ -124,7 +124,7 @@ async def search_dify_credentials(keyword: str) -> str:
             SELECT provider_name, model_name, model_type, encrypted_config,
                    created_at, updated_at
             FROM provider_model_credentials
-            WHERE provider_name ILIKE $1 OR model_name ILIKE $1
+            WHERE encrypted_config ILIKE $1 OR credential_name ILIKE $1
             ORDER BY updated_at DESC
             LIMIT 50
             """,
@@ -142,7 +142,7 @@ async def search_dify_credentials(keyword: str) -> str:
             SELECT provider, encrypted_credentials,
                    created_at, updated_at
             FROM tool_builtin_providers
-            WHERE provider ILIKE $1
+            WHERE encrypted_credentials ILIKE $1
             ORDER BY updated_at DESC
             LIMIT 50
             """,
