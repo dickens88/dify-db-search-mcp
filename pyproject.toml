@@ -1,0 +1,14 @@
+[project]
+name = "dify-db-search-mcp"
+version = "0.1.0"
+description = "MCP server to search Dify PostgreSQL for credentials and environment variables"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.0.0",
+    "asyncpg>=0.29.0",
+    "uvicorn>=0.30.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

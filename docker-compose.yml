@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  dify-db-search-mcp:
+    build: .
+    container_name: dify-db-search-mcp
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Database connection
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE:-dify}
+      # API Key authentication (leave empty to disable)
+      MCP_API_KEY: ${MCP_API_KEY}
+    networks:
+      - docker_default
+
+networks:
+  docker_default:
+    external: true
