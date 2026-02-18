@@ -204,12 +204,15 @@ async def search_workflows_by_plugin(plugin_keyword: str) -> str:
                    w.app_id,
                    a.name AS app_name,
                    w.graph,
+                   w.version,
                    w.created_at,
                    w.updated_at
             FROM workflows w
             LEFT JOIN apps a ON a.id = w.app_id
             WHERE w.graph ILIKE $1
-            ORDER BY w.app_id, w.updated_at DESC
+            ORDER BY w.app_id,
+                     (w.version = 'draft') DESC,
+                     w.updated_at DESC
             LIMIT 50
             """,
             pattern,
@@ -257,6 +260,7 @@ async def search_workflows_by_plugin(plugin_keyword: str) -> str:
             results.append({
                 "app_id": str(row["app_id"]),
                 "app_name": row["app_name"] or "",
+                "version": row["version"] or "",
                 "matching_tools": matching_tools,
                 "updated_at": str(row["updated_at"]) if row["updated_at"] else None,
             })
@@ -289,12 +293,15 @@ async def search_workflows_by_llm(model_keyword: str) -> str:
                    w.app_id,
                    a.name AS app_name,
                    w.graph,
+                   w.version,
                    w.created_at,
                    w.updated_at
             FROM workflows w
             LEFT JOIN apps a ON a.id = w.app_id
             WHERE w.graph ILIKE $1
-            ORDER BY w.app_id, w.updated_at DESC
+            ORDER BY w.app_id,
+                     (w.version = 'draft') DESC,
+                     w.updated_at DESC
             LIMIT 50
             """,
             pattern,
@@ -342,6 +349,7 @@ async def search_workflows_by_llm(model_keyword: str) -> str:
             results.append({
                 "app_id": str(row["app_id"]),
                 "app_name": row["app_name"] or "",
+                "version": row["version"] or "",
                 "matching_llms": matching_llms,
                 "updated_at": str(row["updated_at"]) if row["updated_at"] else None,
             })
