@@ -196,19 +196,22 @@ async def search_workflows_by_plugin(plugin_keyword: str) -> str:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """
-            SELECT DISTINCT ON (w.app_id)
-                   w.app_id,
-                   a.name AS app_name,
-                   w.graph,
-                   w.version,
-                   w.created_at,
-                   w.updated_at
-            FROM workflows w
-            LEFT JOIN apps a ON a.id = w.app_id
-            WHERE w.graph ILIKE $1
-            ORDER BY w.app_id,
-                     (w.version = 'draft') DESC,
-                     w.updated_at DESC
+            WITH latest_workflows AS (
+                SELECT DISTINCT ON (w.app_id)
+                       w.app_id,
+                       a.name AS app_name,
+                       w.graph,
+                       w.version,
+                       w.created_at,
+                       w.updated_at
+                FROM workflows w
+                LEFT JOIN apps a ON a.id = w.app_id
+                ORDER BY w.app_id,
+                         (w.version = 'draft') DESC,
+                         w.updated_at DESC
+            )
+            SELECT * FROM latest_workflows
+            WHERE graph ILIKE $1
             LIMIT 50
             """,
             pattern,
@@ -285,19 +288,22 @@ async def search_workflows_by_llm(model_keyword: str) -> str:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """
-            SELECT DISTINCT ON (w.app_id)
-                   w.app_id,
-                   a.name AS app_name,
-                   w.graph,
-                   w.version,
-                   w.created_at,
-                   w.updated_at
-            FROM workflows w
-            LEFT JOIN apps a ON a.id = w.app_id
-            WHERE w.graph ILIKE $1
-            ORDER BY w.app_id,
-                     (w.version = 'draft') DESC,
-                     w.updated_at DESC
+            WITH latest_workflows AS (
+                SELECT DISTINCT ON (w.app_id)
+                       w.app_id,
+                       a.name AS app_name,
+                       w.graph,
+                       w.version,
+                       w.created_at,
+                       w.updated_at
+                FROM workflows w
+                LEFT JOIN apps a ON a.id = w.app_id
+                ORDER BY w.app_id,
+                         (w.version = 'draft') DESC,
+                         w.updated_at DESC
+            )
+            SELECT * FROM latest_workflows
+            WHERE graph ILIKE $1
             LIMIT 50
             """,
             pattern,
