@@ -121,10 +121,9 @@ async def search_dify_credentials(keyword: str) -> str:
         # 1. provider_model_credentials
         rows = await conn.fetch(
             """
-            SELECT provider_name, model_name, model_type, encrypted_config,
-                   created_at, updated_at
+            SELECT provider_name, model_name, created_at, updated_at
             FROM provider_model_credentials
-            WHERE provider_name ILIKE $1 OR model_name ILIKE $1
+            WHERE encrypted_config ILIKE $1 OR credential_name ILIKE $1
             ORDER BY updated_at DESC
             LIMIT 50
             """,
@@ -132,17 +131,15 @@ async def search_dify_credentials(keyword: str) -> str:
         )
         results["provider_model_credentials"] = _format_rows(
             rows,
-            ["provider_name", "model_name", "model_type", "encrypted_config",
-             "created_at", "updated_at"],
+            ["provider_name", "model_name", "created_at", "updated_at"],
         )
 
         # 2. tool_builtin_providers
         rows = await conn.fetch(
             """
-            SELECT provider, encrypted_credentials,
-                   created_at, updated_at
+            SELECT provider, created_at, updated_at
             FROM tool_builtin_providers
-            WHERE provider ILIKE $1
+            WHERE encrypted_credentials ILIKE $1
             ORDER BY updated_at DESC
             LIMIT 50
             """,
@@ -150,15 +147,14 @@ async def search_dify_credentials(keyword: str) -> str:
         )
         results["tool_builtin_providers"] = _format_rows(
             rows,
-            ["provider", "encrypted_credentials", "created_at", "updated_at"],
+            ["provider", "created_at", "updated_at"],
         )
 
         # 3. workflows (deduplicated by app_id, keep latest)
         rows = await conn.fetch(
             """
             SELECT DISTINCT ON (w.app_id)
-                   w.app_id, w.environment_variables,
-                   w.created_at, w.updated_at
+                   w.app_id, w.created_at, w.updated_at
             FROM workflows w
             WHERE w.environment_variables ILIKE $1
             ORDER BY w.app_id, w.updated_at DESC
@@ -168,7 +164,7 @@ async def search_dify_credentials(keyword: str) -> str:
         )
         results["workflows"] = _format_rows(
             rows,
-            ["app_id", "environment_variables", "created_at", "updated_at"],
+            ["app_id", "created_at", "updated_at"],
         )
 
     # Build summary
